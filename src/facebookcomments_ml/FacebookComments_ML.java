@@ -34,7 +34,7 @@ public class FacebookComments_ML {
             
     public static void main(String[] args) throws IOException {
     
-        String trainFileName = "/home/titova_ekaterina/NetBeansProjects/FaceBookHomeWork/Dataset/Dataset/Training/Features_Variant_1.csv";
+        String trainFileName = "/home/kate_t/ML_Prod/FaceBookComments/data/Dataset/Training/Features_Variant_1.csv";
 
         int FoldsCounts = 0;
         List<Double> RMSEMetrix = new ArrayList<>();
