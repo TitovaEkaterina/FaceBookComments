@@ -99,7 +99,7 @@ public class FacebookComments_ML {
                 }
             }
 
-            LinReg model = new LinReg( 200, 0.9, 1000);  
+            LinReg model = new LinReg( 250, 0.7, 1000);  
 
             model.fit(data_train_X, data_train_Y);
 
@@ -142,7 +142,7 @@ public class FacebookComments_ML {
         System.out.println("R2 Sigma = " + stR2.getSigma());
         
 
-        FileWriter csvWriter = new FileWriter("new2.csv");
+        FileWriter csvWriter = new FileWriter("result2.csv");
         csvWriter.append(",");
         csvWriter.append("1");
         csvWriter.append(",");
