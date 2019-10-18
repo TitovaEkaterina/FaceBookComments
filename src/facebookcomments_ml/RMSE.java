@@ -14,12 +14,12 @@ import java.util.List;
  */
 public class RMSE {
     
-    public static double calcRMSE( List<Double> predictVector,  List<Double> testvector){
+    public static double calcRMSE(double[] predictVector,  double[] testvector){
     
         double s = 0;  
-        for(int i = 0; i<testvector.size(); i++){
-            s += (double) (testvector.get(i) - predictVector.get(i))*(testvector.get(i) - predictVector.get(i));
+        for(int i = 0; i<testvector.length; i++){
+            s += (double) (testvector[i] - predictVector[i] )*(testvector[i]  - predictVector[i] );
         }
-        return sqrt(s/testvector.size());
+        return sqrt(s/testvector.length);
     }
 }

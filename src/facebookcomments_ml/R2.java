@@ -13,16 +13,16 @@ import java.util.List;
  */
 public class R2 {
     
-    public static double calcR2( List<Double> predictVector,  List<Double> testvector){
+    public static double calcR2( double[] predictVector,  double[] testvector){
 
             double up = 0;  
             double down = 0;
 
             Statistic st = Statistics.calcMeanAndSig(testvector);
 
-            for(int i = 0; i<predictVector.size(); i++){
-                up += (double) ( testvector.get(i) - predictVector.get(i))*( testvector.get(i) - predictVector.get(i));
-                down += (double) ( testvector.get(i) - st.getMean())*( testvector.get(i) - st.getMean());
+            for(int i = 0; i<predictVector.length; i++){
+                up += (double) ( testvector[i] - predictVector[i])*( testvector[i] - predictVector[i]);
+                down += (double) ( testvector[i] - st.getMean())*( testvector[i] - st.getMean());
             }
             return 1 - (up/down);
         }

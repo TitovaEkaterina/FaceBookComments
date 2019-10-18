@@ -23,7 +23,7 @@ public class VectorOperation {
                 if (st.getSigma() != 0){
                     vector.put(vector.rows*i + j, (vector.get(vector.rows*i + j) - st.getMean())/st.getSigma());
                 } else {
-                   vector.put(vector.rows*i + j, 1);
+                   //vector.put(vector.rows*i + j, 1);
                 }
             }
         }

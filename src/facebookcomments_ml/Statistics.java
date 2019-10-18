@@ -14,17 +14,17 @@ import org.jblas.DoubleMatrix;
  */
 public class Statistics{
     
-    public static Statistic calcMeanAndSig( List<Double> vector ){
+    public static Statistic calcMeanAndSig( double[] vector ){
     
         double sum = 0;
         double summSquare = 0;
-        for (int i = 0; i < vector.size(); ++i){
-            sum += vector.get(i);
-            summSquare +=  vector.get(i)*vector.get(i);
+        for (int i = 0; i < vector.length; ++i){
+            sum += vector[i];
+            summSquare +=  vector[i]*vector[i];
         }
         Statistic st = new Statistic();
-        st.setMean(sum/vector.size());
-        st.setSigma(Math.sqrt(summSquare/vector.size() - st.getMean()*st.getMean()));
+        st.setMean(sum/vector.length);
+        st.setSigma(Math.sqrt(summSquare/vector.length - st.getMean()*st.getMean()));
         
         return st;
     }

@@ -19,36 +19,34 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.jblas.DoubleMatrix;
 
 /**
  *
  * @author titova_ekaterina
  */
-
 public class FacebookComments_ML {
 
     /**
      * @param args the command line arguments
      */
-    
-            
     public static void main(String[] args) throws IOException {
-    
-        String trainFileName = "/home/kate_t/ML_Prod/FaceBookComments/data/Dataset/Training/Features_Variant_1.csv";
+
+        String trainFileName = "/home/titova_ekaterina/NetBeansProjects/ML_Facebook_LinearRegression_2019/Dataset/Dataset/Training/Features_Variant_1.csv";
 
         int FoldsCounts = 0;
-        List<Double> RMSEMetrix = new ArrayList<>();
-        List<Double> R2Metrix = new ArrayList<>();
-        List<List<Double>> dataSet = new ArrayList<>();
+        double[] RMSEMetrix = new double[5];
+        double[] R2Metrix = new double[5];
+        double[][] dataSet = new double[5][];
         List<List<String>> records = new ArrayList<>();
-       
+
         try (BufferedReader br = new BufferedReader(new FileReader(trainFileName))) {
             String line;
             while ((line = br.readLine()) != null) {
                 FoldsCounts++;
                 String[] values = line.split(",");
                 String[] valuesWithOnes = new String[values.length + 1];
-                for(int i=0; i<values.length - 1; ++i){
+                for (int i = 0; i < values.length - 1; ++i) {
                     valuesWithOnes[i] = values[i];
                 }
                 valuesWithOnes[values.length - 1] = "1";
@@ -57,92 +55,95 @@ public class FacebookComments_ML {
             }
         } catch (Exception ex) {
             Logger.getLogger(FacebookComments_ML.class.getName()).log(Level.SEVERE, null, ex);
-        } 
-        FoldsCounts/=5;
-        Collections.shuffle(records, new Random()); 
-        
-        
-
-        List<Double> dataY = new ArrayList<>();
-        List<List<Double>> dataX = new ArrayList<>();
-        for(int i=0; i<records.size(); ++i){
-            List<String> tempVector = records.get(i);
-            List<Double> currentX = new ArrayList<>();
-            for(int j=0;j<tempVector.size() - 1; ++j){
-                currentX.add(Double.parseDouble(tempVector.get(j)));
-            }
-            dataX.add(currentX);
-            dataY.add(Double.parseDouble(tempVector.get(tempVector.size()-1)));
         }
-        
+        FoldsCounts /= 5;
+        Collections.shuffle(records, new Random());
 
-        List<Double> data_train_Y = new ArrayList<>();
-        List<List<Double>> data_train_X = new ArrayList<>();
+        double[] dataY = new double[records.size()];
+        double[][] dataX = new double[records.size()][records.get(0).size() - 1];
         
-        List<Double> data_test_Y = new ArrayList<>();
-        List<List<Double>> data_test_X = new ArrayList<>();
-        
-        for(int i = 0; i<5; ++i){
-        
-            data_train_X.clear();
-            data_test_X.clear();
-            data_train_Y.clear();
-            data_test_Y.clear();
+        for (int i = 0; i < records.size(); ++i) {
+            List<String> tempVector = records.get(i);
+            double[] currentX = new double[tempVector.size() - 1];
+            for (int j = 0; j < tempVector.size() - 1; ++j) {
+                currentX[j] = Double.parseDouble(tempVector.get(j));
+            }
+            dataX[i] = currentX;
+           
+            dataY[i] = Double.parseDouble(tempVector.get(tempVector.size() - 1));
+        }
 
-            for(int j=0;j<dataX.size(); ++j){
-                if(j < FoldsCounts*i || j >= FoldsCounts*(i+1)) {
-                    data_train_X.add(dataX.get(j));
-                    data_train_Y.add(dataY.get(j));
+        double[] data_train_Y;
+        double[][] data_train_X;
+
+        double[] data_test_Y;
+        double[][] data_test_X;
+
+        for (int i = 0; i < 5; ++i) {
+
+            data_train_X = new  double[dataX.length - dataX.length/5][];
+            data_test_X = new  double[dataX.length/5][];
+            data_train_Y = new  double[dataX.length - dataX.length/5];
+            data_test_Y = new  double[dataX.length/5];
+            
+            int indexTrain  = 0;
+            int indexTest  = 0;
+            for (int j = 0; j < dataX.length; ++j) {
+                if (j < FoldsCounts * i || j >= FoldsCounts * (i + 1)) {
+                    data_train_X[indexTrain] = dataX[j];
+                    data_train_Y[indexTrain] = dataY[j];
+                    ++indexTrain;
                 } else {
-                    data_test_X.add(dataX.get(j));
-                    data_test_Y.add(dataY.get(j));
+                    data_test_X[indexTest] = dataX[j];
+                    data_test_Y[indexTest] = dataY[j];
+                    ++indexTest;
                 }
             }
-
-            LinReg model = new LinReg( 250, 0.7, 1000);  
-
-            model.fit(data_train_X, data_train_Y);
-
-            List<Double> YPred = model.predict(data_train_X);
             
+            DoubleMatrix data_train_X_matrix = new  DoubleMatrix(data_train_X);
+            DoubleMatrix data_test_X_matrix = new  DoubleMatrix(data_test_X);
+            DoubleMatrix data_train_Y_matrix = new  DoubleMatrix(data_train_Y);
+            DoubleMatrix data_test_Y_matrix = new  DoubleMatrix(data_test_Y);
+
+            LinReg model = new LinReg(2250, 0.92, 1000);
+
+            model.fit(data_train_X_matrix, data_train_Y_matrix);
+
+            double[] YPred = model.predict(data_train_X_matrix);
+
             double RMSE_train = RMSE.calcRMSE(YPred, data_train_Y);
             double R2_train = R2.calcR2(YPred, data_train_Y);
-            
-            System.out.println("RMSE trening fold "+i+" = "+RMSE_train);
-            
-            System.out.println("R2 trening fold "+i+" = " + R2_train);
-            
-         
-            List<Double>  YPredTest = model.predict(data_test_X);
-            
+
+            System.out.println("RMSE trening fold " + i + " = " + RMSE_train);
+
+            System.out.println("R2 trening fold " + i + " = " + R2_train);
+
+            double[] YPredTest = model.predict(data_test_X_matrix);
+
             double RMSE_test = RMSE.calcRMSE(YPredTest, data_test_Y);
             double R2_test = R2.calcR2(YPredTest, data_test_Y);
-            
-            
-            System.out.println("RMSE test fold "+i+" = "+RMSE_test);
-            
-            System.out.println("R2 test fold "+i+" = " + R2_test);
+
+            System.out.println("RMSE test fold " + i + " = " + RMSE_test);
+
+            System.out.println("R2 test fold " + i + " = " + R2_test);
             System.out.println();
             System.out.println();
             System.out.println();
 
-            RMSEMetrix.add(RMSE_test);
-            R2Metrix.add(R2_test);
-            dataSet.add(model.getW());
+            RMSEMetrix[i] = RMSE_test;
+            R2Metrix[i] = R2_test;
+            dataSet[i] = model.getW();
         }
 
-
-
-        Statistic stR2 = Statistics.calcMeanAndSig(R2Metrix );
+        Statistic stR2 = Statistics.calcMeanAndSig(R2Metrix);
         Statistic stRMSE = Statistics.calcMeanAndSig(RMSEMetrix);
-        
+
         System.out.println("RMSE Mean = " + stRMSE.getMean());
         System.out.println("RMSE Sigma = " + stRMSE.getSigma());
         System.out.println("R2 Mean = " + stR2.getMean());
         System.out.println("R2 Sigma = " + stR2.getSigma());
-        
 
-        FileWriter csvWriter = new FileWriter("result2.csv");
+        FileWriter csvWriter = new FileWriter("result.csv");
         csvWriter.append(",");
         csvWriter.append("1");
         csvWriter.append(",");
@@ -159,24 +160,23 @@ public class FacebookComments_ML {
         csvWriter.append("SD");
         csvWriter.append("\n");
 
-        csvWriter.append("RMSE,"+RMSEMetrix.get(0)+","+RMSEMetrix.get(1)+","+RMSEMetrix.get(2)+","+RMSEMetrix.get(3)+","+RMSEMetrix.get(4)+","+stRMSE.getMean()+","+stRMSE.getSigma()+",\n");
-        csvWriter.append("R2,"+R2Metrix.get(0)+","+R2Metrix.get(1)+","+R2Metrix.get(2)+","+R2Metrix.get(3)+","+R2Metrix.get(4)+","+stR2.getMean()+","+stR2.getSigma()+",\n");
+        csvWriter.append("RMSE," + RMSEMetrix[0] + "," + RMSEMetrix[1] + "," + RMSEMetrix[2] + "," + RMSEMetrix[3] + "," + RMSEMetrix[4] + "," + stRMSE.getMean() + "," + stRMSE.getSigma() + ",\n");
+        csvWriter.append("R2," + R2Metrix[0] + "," + R2Metrix[1] + "," + R2Metrix[2] + "," + R2Metrix[3] + "," + R2Metrix[4] + "," + stR2.getMean() + "," + stR2.getSigma() + ",\n");
 
-        
-        for (int i = 0; i < dataSet.get(0).size(); i++) {
+        for (int i = 0; i < dataSet[0].length; i++) {
             double W_M = 0;
             double W_Sig = 0;
-            for (int k = 0; k < dataSet.size(); ++k) {
-                W_M += dataSet.get(k).get(i);
-                W_Sig += dataSet.get(k).get(i) * dataSet.get(k).get(i);
+            for (int k = 0; k < dataSet.length; ++k) {
+                W_M += dataSet[k][i];
+                W_Sig += dataSet[k][i] * dataSet[k][i];
             }
-            W_M = W_M / dataSet.size();
-            W_Sig = sqrt(W_Sig / dataSet.size() - pow(W_M,2));
-            csvWriter.append("W[" + i + "]," + dataSet.get(0).get(i) + "," + dataSet.get(1).get(i) + "," + dataSet.get(2).get(i) + "," + dataSet.get(3).get(i) + "," + dataSet.get(4).get(i) + "," + W_M + "," + W_Sig + ",\n");
+            W_M = W_M / dataSet.length;
+            W_Sig = sqrt(W_Sig / dataSet.length - pow(W_M, 2));
+            csvWriter.append("W[" + i + "]," + dataSet[0][i] + "," + dataSet[1][i] + "," + dataSet[2][i] + "," + dataSet[3][i] + "," + dataSet[4][i] + "," + W_M + "," + W_Sig + ",\n");
         }
 
         csvWriter.flush();
         csvWriter.close();
     }
-    
+
 }
