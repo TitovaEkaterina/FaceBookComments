@@ -7,7 +7,7 @@ package facebookcomments_ml;
 
 /**
  *
- * @author boyko_mihail
+ * @author titova_ekaterina
  */
 public enum LossFuctions {
     
