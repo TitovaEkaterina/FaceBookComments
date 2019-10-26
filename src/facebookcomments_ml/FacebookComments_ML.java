@@ -32,7 +32,7 @@ public class FacebookComments_ML {
      */
     public static void main(String[] args) throws IOException {
 
-        String trainFileName = "/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Dataset/Dataset/Training/Features_Variant_1.csv";
+        String trainFileName = "/home/titova_ekaterina/ML_Facebookataset/Dataset/Training/Features_Variant_1.csv";
 
         int FoldsCounts = 0;
         double[] RMSEMetrix = new double[5];
