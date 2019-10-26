@@ -32,7 +32,7 @@ public class FacebookComments_ML {
      */
     public static void main(String[] args) throws IOException {
 
-        String trainFileName = "/home/titova_ekaterina/NetBeansProjects/ML_Facebook_LinearRegression_2019/Dataset/Dataset/Training/Features_Variant_1.csv";
+        String trainFileName = "/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Dataset/Dataset/Training/Features_Variant_1.csv";
 
         int FoldsCounts = 0;
         double[] RMSEMetrix = new double[5];
@@ -105,7 +105,7 @@ public class FacebookComments_ML {
             DoubleMatrix data_train_Y_matrix = new  DoubleMatrix(data_train_Y);
             DoubleMatrix data_test_Y_matrix = new  DoubleMatrix(data_test_Y);
 
-            LinReg model = new LinReg(2250, 0.92, 1000);
+            LinReg model = new LinReg(750, 0.9, 2500, LossFuctions.RMSE);
 
             model.fit(data_train_X_matrix, data_train_Y_matrix);
 
@@ -143,7 +143,7 @@ public class FacebookComments_ML {
         System.out.println("R2 Mean = " + stR2.getMean());
         System.out.println("R2 Sigma = " + stR2.getSigma());
 
-        FileWriter csvWriter = new FileWriter("result.csv");
+        FileWriter csvWriter = new FileWriter("new_RMSE.csv");
         csvWriter.append(",");
         csvWriter.append("1");
         csvWriter.append(",");
