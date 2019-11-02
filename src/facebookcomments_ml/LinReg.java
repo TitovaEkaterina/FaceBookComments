@@ -21,16 +21,11 @@ public class LinReg {
     private int countOfEpoch;
     private double alpha;
     private int batchSize;
-    private LossFuctions lossFuctions;
 
     private DoubleMatrix W;
 
-    public LinReg(int countOfEpoch, double alpha, int batchSize, LossFuctions lossFuctions) {
-        if (lossFuctions == LossFuctions.MSE) {
-            this.alpha = alpha / 100;
-        } else {
-            this.alpha = alpha;
-        }
+    public LinReg(int countOfEpoch, double alpha, int batchSize) {
+        this.alpha = alpha;
         this.countOfEpoch = countOfEpoch;
         this.batchSize = batchSize;
     }
@@ -108,13 +103,11 @@ public class LinReg {
 
                 DoubleMatrix current_predict_value = predict_value(newW, bachX);
                 DoubleMatrix diff;
-                if (lossFuctions == LossFuctions.MSE) {
-                    diff = (bachY.sub(current_predict_value));
-                } else {
-                    diff = (bachY.sub(current_predict_value)).div(MatrixFunctions.sqrt((bachY.sub(current_predict_value)).mul(bachY.sub(current_predict_value))));
-                }
+
+                diff = (bachY.sub(current_predict_value));
+//                    diff = (bachY.sub(current_predict_value)).div(MatrixFunctions.sqrt((bachY.sub(current_predict_value)).mul(bachY.sub(current_predict_value))));
                 diff = diff.mul(alpha);
-        
+
                 newW = newW.add(((diff.transpose().mmul(bachX)).div(bachY.rows)).transpose());
 
                 W = newW;
